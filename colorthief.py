@@ -46,7 +46,7 @@ class ColorThief(object):
         palette = self.get_palette(5, quality)
         return palette[0]
 
-    def get_palette(self, color_count=10, quality=10):
+    def get_palette(self, color_count=10, quality=10, get_dominance=False):
         """Build a color palette.  We are using the median cut algorithm to
         cluster similar colors.
 
@@ -71,7 +71,13 @@ class ColorThief(object):
         # Send array to quantize function which clusters values
         # using median cut algorithm
         cmap = MMCQ.quantize(valid_pixels, color_count)
-        return cmap.palette
+
+        if not get_dominance:
+            return cmap.palette
+        else:
+            return [
+                dict(color=vbox['color'], dominance=vbox['vbox'].count / pixel_count) for vbox in cmap.vboxes.contents
+            ]
 
 
 class MMCQ(object):
